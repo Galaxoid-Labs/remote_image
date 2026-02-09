@@ -1,9 +1,27 @@
 [gd_scene format=3 uid="uid://d1bfdnbqmeamo"]
 
-[ext_resource type="Script" uid="uid://djya1vbttomfw" path="res://main.gd" id="1_ig7tw"]
+[sub_resource type="GDScript" id="GDScript_7dm0k"]
+script/source = "extends CanvasLayer
+
+func _ready() -> void:
+	var req = RemoteImageRequest.new(\"https://godotengine.org/assets/press/logo_large_color_light.png\")
+	req.received.connect(_on_image_received)
+	req.failed.connect(_on_image_failed)
+	add_child(req)
+	req.download()
+	
+func _on_image_received(image: ImageTexture, url: String) -> void:
+	if image != null:
+		print(\"Received image from: \", url)
+		$TextureRect.texture = image
+		$TextureRect.set_size(Vector2(500, 500))
+	
+func _on_image_failed(url: String, error: String) -> void:
+	print(\"Image load failed for: \", url, error)
+"
 
 [node name="Main" type="CanvasLayer" unique_id=1809450124]
-script = ExtResource("1_ig7tw")
+script = SubResource("GDScript_7dm0k")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1848588998]
 anchors_preset = 8

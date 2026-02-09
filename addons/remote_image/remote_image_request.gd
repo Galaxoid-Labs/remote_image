@@ -22,8 +22,8 @@ class_name RemoteImageRequest
 signal received
 signal failed
 
-var image_load_method: String
-const valid_types: Dictionary = {
+var _image_load_method: String
+const _valid_types: Dictionary = {
 	"image/png": "load_png_from_buffer",
 	"image/jpeg": "load_jpg_from_buffer",
 	"image/svg+xml": "load_svg_from_buffer",
@@ -31,35 +31,47 @@ const valid_types: Dictionary = {
 	"image/bmp": "load_bmp_from_buffer"
 }
 
-var url: String
+var _url: String
+var _remove_when_done: bool
+
+func set_url(url: String) -> void:
+	_url = url
 
 func download() -> void:
-	var has_prefix = url.begins_with("https://") || url.begins_with("http://")
+	var has_prefix = _url.begins_with("https://") || _url.begins_with("http://")
 	
 	if not has_prefix:
-		failed.emit(url, "No proper url")
+		failed.emit(_url, "No proper url")
+		if _remove_when_done:
+			queue_free()
 		return
 		
-	var cached_image = RemoteImageCache.get_image_for_url(url)
+	var cached_image = RemoteImageCache.get_image_for_url(_url)
 	if cached_image != null:
-		received.emit(cached_image, url)
+		received.emit(cached_image, _url, true)
+		if _remove_when_done:
+			queue_free()
 		return
 		
-	var error: Error = request(url)
+	var error: Error = request(_url)
 	if error != OK:
-		failed.emit(url, error_string(error))
+		failed.emit(_url, error_string(error))
+		if _remove_when_done:
+			queue_free()
 		return
-		
-func _init(url: String) -> void:
-	self.url = url
-	
+
+func _init(url: String, remove_when_done: bool = true) -> void:
+	_url = url
+	_remove_when_done = remove_when_done
+
 func _ready() -> void:
 	request_completed.connect(_on_request_completed)
-	
+
 func _on_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray) -> void:
 	if response_code != 200:
-		failed.emit(url, error_string(result))
-		queue_free()
+		failed.emit(_url, error_string(result))
+		if _remove_when_done:
+			queue_free()
 		return
 		
 	var content_type: String = ""
@@ -69,22 +81,25 @@ func _on_request_completed(result: int, response_code: int, headers: PackedStrin
 			content_type = val.split("Content-Type: ")[1]
 			break
 			
-	image_load_method = valid_types.get(content_type, "")
+	_image_load_method = _valid_types.get(content_type, "")
 	var image: Image = Image.new()
 	var error: Error = FAILED
 	
-	if image_load_method != "":
-		error = image.call(image_load_method, body)
+	if _image_load_method != "":
+		error = image.call(_image_load_method, body)
 		if error != OK:
-			failed.emit(url, error_string(error))
-			queue_free()
+			failed.emit(_url, error_string(error))
+			if _remove_when_done:
+				queue_free()
 			return
 	else:
-		failed.emit(url, "unhandled image type")
-		queue_free()
+		failed.emit(_url, "unhandled image type")
+		if _remove_when_done:
+			queue_free()
 		return
 			
 	var image_texture = ImageTexture.create_from_image(image)
-	RemoteImageCache.set_image_for_url(url, image_texture)
-	received.emit(image_texture, url)
-	queue_free()
+	RemoteImageCache.set_image_for_url(_url, image_texture)
+	received.emit(image_texture, _url, false)
+	if _remove_when_done:
+		queue_free()

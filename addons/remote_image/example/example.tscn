@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://67q80r63631o"]
+
+[ext_resource type="Script" uid="uid://7trskn2bwu80" path="res://addons/remote_image/example/example.gd" id="1_s783m"]
+
+[node name="Example" type="Control" unique_id=650775719]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_s783m")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=889296574]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer" unique_id=697040878]
+layout_mode = 2

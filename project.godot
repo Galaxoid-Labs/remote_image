@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="remote_image"
-run/main_scene="uid://d1bfdnbqmeamo"
+run/main_scene="uid://67q80r63631o"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
