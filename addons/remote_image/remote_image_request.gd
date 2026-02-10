@@ -1,25 +1,38 @@
-##### Example of how to use
-#extends CanvasLayer
-#
-#	func _ready() -> void:
-#		var req = RemoteImageRequest.new("https://godotengine.org/assets/press/logo_large_color_light.png")
-#		req.received.connect(_on_image_received)
-#		req.failed.connect(_on_image_failed)
-#		add_child(req)
-#		req.download()
-#
-#	func _on_image_received(image: ImageTexture, url: String) -> void:
-#		if image != null:
-#			print("Received image from: ", url)
-#			$TextureRect.texture = image
-#
-#	func _on_image_failed(url: String, error: String) -> void:
-#		print("Image load failed for: ", url, error)
-
 extends HTTPRequest
 class_name RemoteImageRequest
+## This class allows you to download and cache remote images from a url
+## Usage:
+## [codeblock]
+## func _ready():
+##    const url = "https://godotengine.org/assets/press/logo_large_color_light.png"
+##
+##    # You can pass false after the url if you don't want the RemoteImageRequest to be
+##    # removed from the scene automatically. This would allow you to reuse the request
+##    var req = RemoteImageRequest.new(url, true)
+##    req.received.connect(_on_image_received)
+##    req.failed.connect(_on_image_failed)
+##    add_child(req)
+##    req.download()
+##
+##
+##func _on_image_received(image: ImageTexture, url: String, from_cache: bool) -> void:
+##    if image:
+##        print("Received image from: ", url)
+##        print("From cache: ", from_cache)
+##        $MarginContainer/TextureRect.texture = image
+##    else:
+##        print("At this point, this should never happen...")
+##
+##func _on_image_failed(url: String, error: String) -> void:
+##    print("Image load failed for: ", url, error)
+## [/codeblock]
 
+## (image: [ImageTexture], url: [String], from_cache: [bool])
+## This signal is called on successful download or return from cache
 signal received
+
+## (url: [String], error: [String])
+## This signal is called on error
 signal failed
 
 var _image_load_method: String
@@ -34,9 +47,11 @@ const _valid_types: Dictionary = {
 var _url: String
 var _remove_when_done: bool
 
+## Set a new url for the request to use
 func set_url(url: String) -> void:
 	_url = url
 
+## Initiate the download of the image after setting url
 func download() -> void:
 	var has_prefix = _url.begins_with("https://") || _url.begins_with("http://")
 	

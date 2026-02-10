@@ -49,6 +49,9 @@ func _on_image_failed(url: String, error: String) -> void:
 - Cache is in-memory and lasts for the lifetime of the running game.
 - If the same URL is requested again, the cached image is returned immediately.
 
+## TODO
+- Maybe add persistant caching?
+
 ## Acknowledgments
 - https://github.com/Skyvastern/image-download-tutorial
 

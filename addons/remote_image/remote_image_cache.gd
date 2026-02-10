@@ -1,5 +1,3 @@
-# Autoload: remote_image_cache.gd
-# RemoteImageCache
 extends Node
 
 var _cache: Dictionary[String, ImageTexture]

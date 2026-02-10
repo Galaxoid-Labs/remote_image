@@ -35,7 +35,6 @@ func _ready() -> void:
 	add_child(req2)
 	req2.download()
 	
-
 	
 func _on_image_received(image: ImageTexture, url: String, from_cache: bool) -> void:
 	if image:
