@@ -40,7 +40,7 @@ func _on_image_received(image: ImageTexture, url: String, from_cache: bool) -> v
 	if image:
 		print("Received image from: ", url)
 		print("From cache: ", from_cache)
-		$MarginContainer/TextureRect.texture = image
+		$TextureRect.texture = image
 	else:
 		print("At this point, this should never happen...")
 	
